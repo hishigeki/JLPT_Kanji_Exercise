@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>JLPT 練習問題メニュー</title>
+
+  <style>
+    /* ==============================
+       基本設定
+    ============================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family:
+        "BIZ UDPGothic",
+        "Yu Gothic",
+        "Meiryo",
+        sans-serif;
+      color: #333;
+      background:
+        linear-gradient(
+          135deg,
+          #f5f7fa 0%,
+          #eef2f7 50%,
+          #f9f4f7 100%
+        );
+      min-height: 100vh;
+    }
+
+    /* ==============================
+       ヘッダー
+    ============================== */
+    .header {
+      background: linear-gradient(135deg, #6d0034, #a50050);
+      color: #fff;
+      padding: 36px 20px 32px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    .header-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .header-label {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 5px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      border-radius: 20px;
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      letter-spacing: 0.06em;
+    }
+
+    .header p {
+      margin: 14px 0 0;
+      font-size: clamp(0.95rem, 2.6vw, 1.1rem);
+      line-height: 1.8;
+    }
+
+    /* ==============================
+       メイン領域
+    ============================== */
+    .container {
+      width: min(1100px, calc(100% - 30px));
+      margin: 30px auto 50px;
+    }
+
+    .information {
+      margin-bottom: 25px;
+      padding: 20px;
+      border-left: 6px solid #a50050;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+      line-height: 1.8;
+    }
+
+    .information h2 {
+      margin: 0 0 8px;
+      color: #7d003c;
+      font-size: 1.25rem;
+    }
+
+    .information p {
+      margin: 0;
+    }
+
+    /* ==============================
+       進捗表示
+    ============================== */
+    .progress-area {
+      margin-bottom: 25px;
+      padding: 18px 20px;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .progress-title {
+      margin: 0;
+      font-size: 1.05rem;
+      color: #555;
+    }
+
+    .progress-text {
+      font-weight: bold;
+      color: #a50050;
+      white-space: nowrap;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 14px;
+      overflow: hidden;
+      border-radius: 10px;
+      background-color: #e4e4e4;
+    }
+
+    .progress-value {
+      width: 0;
+      height: 100%;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #a50050, #e91e63);
+      transition: width 0.4s ease;
+    }
+
+    /* ==============================
+       問題メニュー
+    ============================== */
+    .menu-title {
+      margin: 30px 0 18px;
+      text-align: center;
+      color: #6d0034;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .menu-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 250px;
+      padding: 24px 22px 20px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      border-radius: 16px;
+      background-color: #fff;
+      box-shadow: 0 5px 16px rgba(0, 0, 0, 0.09);
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-5px);
+      border-color: #d48aaa;
+      box-shadow: 0 10px 25px rgba(80, 0, 40, 0.17);
+    }
+
+    .menu-number {
+      position: absolute;
+      top: -16px;
+      right: -10px;
+      color: rgba(165, 0, 80, 0.08);
+      font-size: 6rem;
+      font-weight: bold;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .menu-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 58px;
+      height: 58px;
+      margin-bottom: 15px;
+      border-radius: 50%;
+      color: #fff;
+      background: linear-gradient(135deg, #a50050, #dc4b8e);
+      font-size: 1.8rem;
+      box-shadow: 0 4px 10px rgba(165, 0, 80, 0.28);
+    }
+
+    .menu-card h3 {
+      position: relative;
+      margin: 0 0 10px;
+      color: #750039;
+      font-size: 1.3rem;
+    }
+
+    .menu-card p {
+      position: relative;
+      flex-grow: 1;
+      margin: 0 0 20px;
+      color: #666;
+      line-height: 1.7;
+      font-size: 0.96rem;
+    }
+
+    .start-button {
+      position: relative;
+      display: block;
+      width: 100%;
+      padding: 13px 15px;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      background: linear-gradient(135deg, #8e0045, #b60059);
+      font-size: 1rem;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .start-button:hover {
+      opacity: 0.88;
+      transform: scale(1.02);
+    }
+
+    .start-button:focus {
+      outline: 4px solid rgba(233, 30, 99, 0.25);
+      outline-offset: 2px;
+    }
+
+    .check-area {
+      position: relative;
+      margin-top: 13px;
+      text-align: center;
+    }
+
+    .check-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #555;
+      font-size: 0.9rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .complete-check {
+      width: 19px;
+      height: 19px;
+      accent-color: #a50050;
+      cursor: pointer;
+    }
+
+    .menu-card.completed {
+      border-color: #298c58;
+      background:
+        linear-gradient(
+          135deg,
+          #ffffff 0%,
+          #f0fff6 100%
+        );
+    }
+
+    .menu-card.completed::after {
+      content: "学習済み";
+      position: absolute;
+      top: 14px;
+      left: -34px;
+      width: 125px;
+      padding: 5px 0;
+      color: #fff;
+      background-color: #298c58;
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-align: center;
+      transform: rotate(-40deg);
+    }
+
+    /* ==============================
+       学習上の注意
+    ============================== */
+    .notice {
+      margin-top: 30px;
+      padding: 22px;
+      border-radius: 12px;
+      background-color: #fff9e8;
+      border: 1px solid #e5cc83;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .notice h2 {
+      margin: 0 0 12px;
+      color: #805f00;
+      font-size: 1.2rem;
+    }
+
+    .notice ul {
+      margin: 0;
+      padding-left: 1.4em;
+      line-height: 1.9;
+    }
+
+    /* ==============================
+       フッター
+    ============================== */
+    .footer {
+      padding: 25px 15px;
+      color: #fff;
+      background-color: #4b0025;
+      text-align: center;
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    /* ==============================
+       スマートフォン対応
+    ============================== */
+    @media (max-width: 600px) {
+      .header {
+        padding: 27px 15px 25px;
+      }
+
+      .container {
+        width: min(100% - 20px, 1100px);
+        margin-top: 20px;
+      }
+
+      .information,
+      .progress-area,
+      .notice {
+        padding: 17px;
+      }
+
+      .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .menu-card {
+        min-height: auto;
+        padding: 21px 18px 18px;
+      }
+
+      .progress-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-label">日本語能力試験対策</div>
+
+
+  <h1>JLPT 練習問題</h1>
+
+  <p>
+    問題を選んで学習を始めましょう。<br>
+    繰り返し取り組み、合格を目指してください。
+  </p>
+</div>
+
+
+  </header>
+
+  <main class="container">
+
+
+<section class="information">
+  <h2>学習の進め方</h2>
+
+  <p>
+    「問題を始める」ボタンを押すと、Googleフォームの問題が
+    新しいタブで開きます。問題を解き終えたら、
+    「この問題を学習済みにする」にチェックを入れてください。
+  </p>
+</section>
+
+<section class="progress-area">
+  <div class="progress-header">
+    <h2 class="progress-title">学習の進み具合</h2>
+    <div id="progressText" class="progress-text">0 / 7 完了</div>
+  </div>
+
+  <div class="progress-bar">
+    <div id="progressValue" class="progress-value"></div>
+  </div>
+</section>
+
+<h2 class="menu-title">問題メニュー</h2>
+
+<section class="menu-grid">
+
+  <!-- 第1問：JLPT 副詞10問 -->
+
+  <article class="menu-card" data-question="1">
+    <div class="menu-number">1</div>
+    <div class="menu-icon">副</div>
+
+
+<h3>JLPT 副詞10問</h3>
+
+<p>
+  JLPTの副詞を学習する10問です。
+  文の意味や前後の関係を考えて、適切な副詞を選びましょう。
+</p>
+
+<a
+  class="start-button"
+  href="https://docs.google.com/forms/d/1wdT-n0_W8YTvgsEdKVv33zDOTPBBNetBSmAG3PzpeMc/viewform"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  問題を始める
+</a>
+
+<div class="check-area">
+  <label class="check-label">
+    <input
+      class="complete-check"
+      type="checkbox"
+      data-question="1"
+    >
+    この問題を学習済みにする
+  </label>
+</div>
+
+
+  </article>
+
+  <!-- 第2問：抽象的・比喩的な使い方 -->
+
+  <article class="menu-card" data-question="2">
+    <div class="menu-number">2</div>
+    <div class="menu-icon">比</div>
+
+
+<h3>抽象的・比喩的な使い方</h3>
+
+<p>
+  言葉の抽象的な意味や比喩的な使い方を学習します。
+  文章の中で表現がどのような意味になるか考えましょう。
+</p>
+
+<a
+  class="start-button"
+  href="https://docs.google.com/forms/d/19ba-rUGCjmP8BViMvrasE39ZWI0OtJTLuEtscy3SHrw/viewform"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  問題を始める
+</a>
+
+<div class="check-area">
+  <label class="check-label">
+    <input
+      class="complete-check"
+      type="checkbox"
+      data-question="2"
+    >
+    この問題を学習済みにする
+  </label>
+</div>
+
+
+  </article>
+
+  <!-- 第3問：Pythonコメント文作成1 -->
+
+  <article class="menu-card" data-question="3">
+    <div class="menu-number">3</div>
+    <div class="menu-icon">Py</div>
+
+
+<h3>Pythonコメント文作成1</h3>
+
+<p>
+  Pythonプログラムの処理内容を読み取り、
+  分かりやすい日本語のコメント文を作成する練習です。
+</p>
+
+<a
+  class="start-button"
+  href="https://docs.google.com/forms/d/12CGYN2EXZoXcqHzXI9w7PfVZfxO_oA0XVv40f-IB0Sw/viewform"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  問題を始める
+</a>
+
+<div class="check-area">
+  <label class="check-label">
+    <input
+      class="complete-check"
+      type="checkbox"
+      data-question="3"
+    >
+    この問題を学習済みにする
+  </label>
+</div>
+
+
+  </article>
+
+  <!-- 第4問：全部合うまで終われません1000問題 -->
+
+  <article class="menu-card" data-question="4">
+    <div class="menu-number">4</div>
+    <div class="menu-icon">千</div>
+
+
+<h3>全部合うまで終われません1000問題</h3>
+
+<p>
+  すべての問題に正解するまで繰り返し挑戦する学習教材です。
+  間違えた問題を確認しながら、全問正解を目指しましょう。
+</p>
+
+<a
+  class="start-button"
+  href="https://script.google.com/a/macros/oist.net/s/AKfycbyO6e4wbbBzuwlLNCvPR6LPpDAEFOdRukrpIuKKIP8f85jNdmHsBUfMqdtz0o0nCqoWnw/exec"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  問題を始める
+</a>
+
+<div class="check-area">
+  <label class="check-label">
+    <input
+      class="complete-check"
+      type="checkbox"
+      data-question="4"
+    >
+    この問題を学習済みにする
+  </label>
+</div>
+
+
+  </article>
+
+  <!-- 第5問：2025前期末試験JLPT -->
+
+  <article class="menu-card" data-question="5">
+    <div class="menu-number">5</div>
+    <div class="menu-icon">試</div>
+
+
+<h3>2025前期末試験 JLPT</h3>
+
+<p>
+  2025年度前期末試験の第1問から第24問です。
+  試験問題を振り返り、間違えた問題を復習しましょう。
+</p>
+
+<a
+  class="start-button"
+  href="https://docs.google.com/forms/d/1-ss_RzKiB_pyxP6hcnF3MbJGiHwmC1JWiiRATr2TrJQ/viewform"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  第1問から第24問を始める
+</a>
+
+<div class="check-area">
+  <label class="check-label">
+    <input
+      class="complete-check"
+      type="checkbox"
+      data-question="5"
+    >
+    この問題を学習済みにする
+  </label>
+</div>
+
+
+  </article>
+
+  <!-- 第6問：間違えやすい漢字 -->
+
+  <article class="menu-card" data-question="6">
+    <div class="menu-number">6</div>
+    <div class="menu-icon">漢</div>
+
+
+<h3>間違えやすい漢字</h3>
+
+<p>
+  読み方や意味を間違えやすい漢字を学習します。
+  正しい読み方と、文章の中での使い方を確認しましょう。
+</p>
+
+<a
+  class="start-button"
+  href="https://docs.google.com/forms/d/1AxM4oXPLmBnhXm-P-iQ_eTqM6m7TdBABIwQRVp26dkc/viewform"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  問題を始める
+</a>
+
+<div class="check-area">
+  <label class="check-label">
+    <input
+      class="complete-check"
+      type="checkbox"
+      data-question="6"
+    >
+    この問題を学習済みにする
+  </label>
+</div>
+
+
+  </article>
+
+  <!-- 第7問：間違えやすい漢字（2） -->
+
+  <article class="menu-card" data-question="7">
+    <div class="menu-number">7</div>
+    <div class="menu-icon">漢2</div>
+
+
+<h3>間違えやすい漢字（2）</h3>
+
+<p>
+  間違えやすい漢字の第2弾です。
+  似た漢字や読み方を混同しないように、繰り返し練習しましょう。
+</p>
+
+<a
+  class="start-button"
+  href="https://docs.google.com/forms/d/1cMf2q4A8PbcGS3-8NIMhMCH8NymlKa5i51oGfY8JsZE/viewform"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  問題を始める
+</a>
+
+<div class="check-area">
+  <label class="check-label">
+    <input
+      class="complete-check"
+      type="checkbox"
+      data-question="7"
+    >
+    この問題を学習済みにする
+  </label>
+</div>
+
+
+  </article>
+
+</section>
+
+
+  </main>
+
+  <footer class="footer">
+    JLPT 練習問題メニュー<br>
+    岡山科学技術専門学校
+  </footer>
+
+  <script>
+    /*
+     * 学習済みチェックをブラウザに保存します。
+     * 同じ端末・同じブラウザで開いた場合に記録が残ります。
+     */
+
+    const STORAGE_KEY = "jlpt_n1_completed_questions";
+    const checkboxes = document.querySelectorAll(".complete-check");
+    const totalQuestions = checkboxes.length;
+
+    /**
+     * 保存済みデータを取得する
+     */
+    function loadCompletedQuestions() {
+      try {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+
+        if (!savedData) {
+          return [];
+        }
+
+        const parsedData = JSON.parse(savedData);
+
+        return Array.isArray(parsedData) ? parsedData : [];
+      } catch (error) {
+        console.error("学習記録を読み込めませんでした。", error);
+        return [];
+      }
+    }
+
+    /**
+     * 学習済みデータを保存する
+     */
+    function saveCompletedQuestions(completedQuestions) {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(completedQuestions)
+        );
+      } catch (error) {
+        console.error("学習記録を保存できませんでした。", error);
+      }
+    }
+
+    /**
+     * 進捗表示を更新する
+     */
+    function updateProgress() {
+      const completedCount =
+        document.querySelectorAll(".complete-check:checked").length;
+
+      const progressPercent =
+        totalQuestions === 0
+          ? 0
+          : (completedCount / totalQuestions) * 100;
+
+      document.getElementById("progressText").textContent =
+        completedCount + " / " + totalQuestions + " 完了";
+
+      document.getElementById("progressValue").style.width =
+        progressPercent + "%";
+    }
+
+    /**
+     * カードの表示を切り替える
+     */
+    function updateCardStyle(checkbox) {
+      const card = checkbox.closest(".menu-card");
+
+      if (!card) {
+        return;
+      }
+
+      card.classList.toggle("completed", checkbox.checked);
+    }
+
+    /**
+     * 保存済みの学習記録を画面に反映する
+     */
+    function restoreProgress() {
+      const completedQuestions = loadCompletedQuestions();
+
+      checkboxes.forEach(function (checkbox) {
+        const questionNumber = checkbox.dataset.question;
+
+        checkbox.checked =
+          completedQuestions.includes(questionNumber);
+
+        updateCardStyle(checkbox);
+      });
+
+      updateProgress();
+    }
+
+    /**
+     * チェック変更時の処理
+     */
+    checkboxes.forEach(function (checkbox) {
+      checkbox.addEventListener("change", function () {
+        const completedQuestions = [];
+
+        checkboxes.forEach(function (item) {
+          if (item.checked) {
+            completedQuestions.push(item.dataset.question);
+          }
+
+          updateCardStyle(item);
+        });
+
+        saveCompletedQuestions(completedQuestions);
+        updateProgress();
+      });
+    });
+
+    restoreProgress();
+  </script>
+
+</body>
+</html>
